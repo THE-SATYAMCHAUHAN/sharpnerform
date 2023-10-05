@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>heloo</h1>
+</body>
+<script>
+    let myObj ={
+        name:"peter",age:45
+    };
+
+    let myObjserialized=JSON.stringify(myObj);
+    console.log(myObjserialized);
+
+    localStorage.setItem('myObj',myObjserialized);
+
+    let myObjdeserialized=JSON.parse(localStorage.getItem("myObj")); 
+    console.log(myObjdeserialized);
+    
+</script>
+</html>
