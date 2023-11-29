@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candy Shop</title>
+    <!-- Include Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <form onsubmit="saveToLocalStorage(event)">
+        <label>Candy Name</label>
+        <input id="candyname" type="text" name="candyname" required/>
+        <label>Description</label>
+        <input id="description" type="text" name="description" required/>
+        <label>Price</label>
+        <input id="price" type="number" name="price"/>
+        <label>Quantity</label>
+        <input type="number" id="quantity" name="quantity" required>
+        <button>Add Item</button>
+    </form>
+    <ul id="listofitem"></ul>
+
+    <script>
+        function saveToLocalStorage(event) {
+            event.preventDefault();
+            const candyname = event.target.candyname.value;
+            const description = event.target.description.value;
+            const price = event.target.price.value;
+            const quantity = event.target.quantity.value;
+
+            const obj = {
+                candyname,
+                description,
+                price,
+                quantity
+            };
+
+            // Save data to local storage
+            const existingItems = JSON.parse(localStorage.getItem("candyItems")) || [];
+            existingItems.push(obj);
+            localStorage.setItem("candyItems", JSON.stringify(existingItems));
+
+            // Save data to CRUD CRUD API
+            axios.post("https://crudcrud.com/api/9243c370f2be41c5b22f7eaed946c675/candydata", obj)
+                .then((response) => {
+                    console.log(response.data);
+                    showUserOnScreen(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            // Retrieve data from local storage
+            const storedItems = JSON.parse(localStorage.getItem("candyItems")) || [];
+            storedItems.forEach((item) => {
+                showUserOnScreen(item);
+            });
+        });
+
+        function showUserOnScreen(obj) {
+            const parentElem = document.getElementById('listofitem');
+            const childElem = document.createElement('li');
+            childElem.textContent = obj.candyname + '-' + obj.description + '-' + obj.price + '-' + obj.quantity;
+
+            const Buy1Button = document.createElement('input');
+            Buy1Button.type = 'button';
+            Buy1Button.value = 'buy1';
+            Buy1Button.onclick = () => {
+                updateQuantity(obj, obj.quantity - 1);
+            };
+
+            const Buy2Button = document.createElement('input');
+            Buy2Button.type = 'button';
+            Buy2Button.value = 'buy2';
+            Buy2Button.onclick = () => {
+                updateQuantity(obj, obj.quantity - 2);
+            };
+
+            const Buy3Button = document.createElement('input');
+            Buy3Button.type = 'button';
+            Buy3Button.value = 'buy3';
+            Buy3Button.onclick = () => {
+                updateQuantity(obj, obj.quantity - 3);
+            };
+
+            function updateQuantity(candy, newQuantity) {
+                // Update quantity in the candy object
+                candy.quantity = newQuantity;
+
+                // Update data in local storage
+                const existingItems = JSON.parse(localStorage.getItem("candyItems")) || [];
+                const index = existingItems.findIndex((item) => item === candy);
+                existingItems[index] = candy;
+                localStorage.setItem("candyItems", JSON.stringify(existingItems));
+
+                // Update data in CRUD CRUD API
+                axios.put(`https://crudcrud.com/api/9243c370f2be41c5b22f7eaed946c675/candydata/${candy._id}`, candy)
+                    .then((res) => {
+                        console.log(res.data);
+                        childElem.textContent = candy.candyname + '-' + candy.description + '-' + candy.price + '-' + candy.quantity;
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+
+            childElem.appendChild(Buy1Button);
+            childElem.appendChild(Buy2Button);
+            childElem.appendChild(Buy3Button);
+            parentElem.appendChild(childElem)
+        }
+    </script>
+</body>
+</html>
